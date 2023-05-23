@@ -1,81 +1,89 @@
+#!/usr/bin/python
+
 import argparse
 import boto3
 import botocore
-import enum
 import os
-import re
+import shutil
 import sys
 import tqdm
 
 from concurrent import futures
+from src.config import DIR_DATA, DIR_IMAGES, DIR_META, OID_BUCKET_NAME
+from src.mask_types import MaskTypes
+from src.utils import (
+    check_image_list,
+    download_image,
+    flush_spacer,
+    get_folder,
+    read_image_list,
+)
 
-image_dir = './data/images'
-
-BUCKET_NAME = 'open-images-dataset'
-REGEX = r'(test|train|validation)/([a-fA-F0-9]*)'
-
-class MaskTypes(str, enum.Enum):
-    test = 'test'
-    train = 'train'
-    validation = 'validation'
-
-def check_and_homogenize_one_image(image):
-  split, image_id = re.match(REGEX, image).groups()
-  yield split, image_id
-
-def check_and_homogenize_image_list(image_list):
-  for line_number, image in enumerate(image_list):
-    try:
-      yield from check_and_homogenize_one_image(image)
-    except (ValueError, AttributeError):
-      raise ValueError(
-          f'ERROR in line {line_number} of the image list. The following image '
-          f'string is not recognized: "{image}".')
-
-def read_image_list_file(image_list_file):
-  with open(image_list_file, 'r') as f:
-    for line in f:
-      yield line.strip().replace('.jpg', '')
-
-def download_one_image(bucket, split, image_id, download_folder):
-  try:
-    bucket.download_file(f'{split}/{image_id}.jpg', os.path.join(download_folder, f'{image_id}.jpg'))
-  except botocore.exceptions.ClientError as exception:
-    sys.exit(f'ERROR when downloading image `{split}/{image_id}`: {str(exception)}')
 
 def main(args):
-  bucket = boto3.resource('s3', config=botocore.config.Config(signature_version=botocore.UNSIGNED)).Bucket(BUCKET_NAME)
+    # Make required directories if they do not exist
+    os.makedirs(DIR_DATA, exist_ok=True)
+    os.makedirs(DIR_IMAGES, exist_ok=True)
 
-  mask_type = args['type']
+    # Define AWS S3 bucket
+    bucket = boto3.resource(
+        "s3", config=botocore.config.Config(signature_version=botocore.UNSIGNED)
+    ).Bucket(OID_BUCKET_NAME)
 
-  if mask_type == 'validation':
-    mask_type = 'val'
+    # Define folder name
+    folder_name = get_folder(args["type"])
 
-  download_folder = os.path.join(image_dir, mask_type)
+    # Define download folder path
+    download_folder = os.path.join(DIR_IMAGES, folder_name)
 
-  if not os.path.exists(download_folder):
-    os.makedirs(download_folder)
+    # Delete download folder if it already exists
+    if os.path.exists(download_folder):
+        try:
+            shutil.rmtree(download_folder)
+        except OSError as e:
+            print("Error: %s - %s." % (e.filename, e.strerror))
 
-  try:
-    image_list = list(check_and_homogenize_image_list(read_image_list_file('meta/{}-images.txt'.format(args['type']))))
-  except ValueError as exception:
-    sys.exit(exception)
+    # Create download folder
+    os.makedirs(download_folder, exist_ok=True)
 
-  progress_bar = tqdm.tqdm(total=len(image_list), desc='Downloading images', leave=True)
-  
-  with futures.ThreadPoolExecutor(max_workers=5) as executor:
-    all_futures = [
-      executor.submit(download_one_image, bucket, split, image_id, download_folder) for (split, image_id) in image_list
-    ]
-    for future in futures.as_completed(all_futures):
-      future.result()
-      progress_bar.update(1)
-  
-  progress_bar.close()
+    # Fetch image list for downloading
+    try:
+        image_list = list(
+            check_image_list(read_image_list("{}/{}-images.txt".format(DIR_META, args["type"])))
+        )
+    except ValueError as exception:
+        sys.exit(exception)
 
-if __name__ == '__main__':
-  parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-  parser.add_argument('type', type=MaskTypes)
-  
-  main(vars(parser.parse_args()))
-  
+    # Setup progress bar for download indicators
+    progress_bar = tqdm.tqdm(
+        total=len(image_list), desc="Downloading images", leave=True
+    )
+
+    # Start downloading
+    with futures.ThreadPoolExecutor(max_workers=5) as executor:
+        all_futures = [
+            executor.submit(download_image, bucket, split, image_id, download_folder)
+            for (split, image_id) in image_list
+        ]
+        for future in futures.as_completed(all_futures):
+            future.result()
+            progress_bar.update(1)
+
+    # Close progress bar since we're done downloading
+    progress_bar.close()
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Download Images from Open Images Dataset",
+        epilog="Find By Color - OID Segmentation Model",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument("type", type=MaskTypes)
+
+    try:
+        main(vars(parser.parse_args()))
+    except KeyboardInterrupt:
+        print(flush_spacer(100), end="\r", flush=True)
+        print("Exited Application")
+        exit(0)

@@ -1,5 +1,7 @@
-opencv-python
 boto3
+clearml
+opencv-python
+tensorboard
 tqdm
-wget
 ultralytics
+wget

@@ -16,10 +16,16 @@ Developer Overview
 
 > Training a model requires a high-end GPU. Local installation will yield the best results.
 
+**Environment Setup:**
+
 - [Local Install ( Recommended )](docs/local-install.md)
 - [Using Dev Containers](docs/using-dev-containers.md)
 - [Using Docker](docs/using-docker.md)
+
+**Model Creation:**
+
 - [Downloading Assets](docs/downloading-assets.md)
 - [Training the Model](docs/training-model.md)
+- [Testing the Model](docs/testing-model.md)
 
 [![Troubleshooting](https://img.shields.io/badge/Troubleshooting-334155.svg?style=for-the-badge&logo=github&logoColor=ffffff&logoWidth=16)](docs/troubleshooting.md)

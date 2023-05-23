@@ -8,7 +8,7 @@
 
 **Requirements**:
 
--   [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [X] [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 ## New Container
 

@@ -29,7 +29,7 @@ Size         | Model            | mAP<sup>box</sup> | mAP<sup>mask</sup> | Speed
 Edit the following line in `train.py` with custom [Training Configuration](https://docs.ultralytics.com/usage/cfg/#train) to tweak performance of our model.
 
 ```python
-model.train(data='config.yaml', epochs=100, imgsz=640)
+args = dict(data='config.yaml', epochs=100, imgsz=640)
 ```
 
 [yolov8n-seg.pt]: https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n-seg.pt
@@ -37,3 +37,11 @@ model.train(data='config.yaml', epochs=100, imgsz=640)
 [yolov8m-seg.pt]: https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8m-seg.pt
 [yolov8l-seg.pt]: https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8l-seg.pt
 [yolov8x-seg.pt]: https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8x-seg.pt
+
+## Resuming Training
+
+If for some reason the training process gets interrupted, you can pick up from the last saved Epoch by running the following:
+
+```bash
+python resume.py
+```

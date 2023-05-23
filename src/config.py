@@ -1,4 +1,28 @@
-CLASSIFICATIONS = [ 
+# Desc: Configuration file for project
+
+# Debug mode
+DEBUG = True
+
+# Directory to store data
+DIR_DATA = "data"
+
+# Directory to store images
+DIR_IMAGES = "data/images"
+
+# Directory to store labels
+DIR_LABELS = "data/labels"
+
+# Directory to store masks
+DIR_MASKS = "masks"
+
+# Directory to store meta data for project
+DIR_META = "meta"
+
+# AWS S3 bucket name where OID images are stored
+OID_BUCKET_NAME = "open-images-dataset"
+
+# Supported classification from OID
+OID_CLASSIFICATIONS = [
     "/m/011k07",
     "/m/012074",
     "/m/0120dh",
@@ -347,10 +371,31 @@ CLASSIFICATIONS = [
     "/m/0ph39",
     "/m/0qjjc",
     "/m/0wdt60w",
-    "/m/0xfy"
+    "/m/0xfy",
 ]
 
-LABELS = {
+# Open Images Dataset mask zip files
+OID_DOWNLOADS = [
+    "https://storage.googleapis.com/openimages/v5/TYPE-masks/TYPE-masks-0.zip",
+    "https://storage.googleapis.com/openimages/v5/TYPE-masks/TYPE-masks-1.zip",
+    "https://storage.googleapis.com/openimages/v5/TYPE-masks/TYPE-masks-2.zip",
+    "https://storage.googleapis.com/openimages/v5/TYPE-masks/TYPE-masks-3.zip",
+    "https://storage.googleapis.com/openimages/v5/TYPE-masks/TYPE-masks-4.zip",
+    "https://storage.googleapis.com/openimages/v5/TYPE-masks/TYPE-masks-5.zip",
+    "https://storage.googleapis.com/openimages/v5/TYPE-masks/TYPE-masks-6.zip",
+    "https://storage.googleapis.com/openimages/v5/TYPE-masks/TYPE-masks-7.zip",
+    "https://storage.googleapis.com/openimages/v5/TYPE-masks/TYPE-masks-8.zip",
+    "https://storage.googleapis.com/openimages/v5/TYPE-masks/TYPE-masks-9.zip",
+    "https://storage.googleapis.com/openimages/v5/TYPE-masks/TYPE-masks-a.zip",
+    "https://storage.googleapis.com/openimages/v5/TYPE-masks/TYPE-masks-b.zip",
+    "https://storage.googleapis.com/openimages/v5/TYPE-masks/TYPE-masks-c.zip",
+    "https://storage.googleapis.com/openimages/v5/TYPE-masks/TYPE-masks-d.zip",
+    "https://storage.googleapis.com/openimages/v5/TYPE-masks/TYPE-masks-e.zip",
+    "https://storage.googleapis.com/openimages/v5/TYPE-masks/TYPE-masks-f.zip",
+]
+
+# Labels matching supported classifications
+OID_LABELS = {
     "/m/011k07": "Tortoise",
     "/m/012074": "Magpie",
     "/m/0120dh": "Sea turtle",
@@ -699,11 +744,8 @@ LABELS = {
     "/m/0ph39": "Canoe",
     "/m/0qjjc": "Remote control",
     "/m/0wdt60w": "Rugby ball",
-    "/m/0xfy": "Armadillo"
+    "/m/0xfy": "Armadillo",
 }
 
-def get_class(id):
-    return CLASSIFICATIONS.index(id)
-
-def get_label(id):
-    return LABELS[id]
+# Regex test for valid OID assets
+OID_REGEX = r"(train|validation)/([a-fA-F0-9]*)"
