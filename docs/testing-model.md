@@ -53,4 +53,4 @@ python predict.py --image /path/to/image.jpg
 
 ---
 
-[![Previous Step](https://img.shields.io/badge/README-121212.svg?logo=github&style=for-the-badge)](../training-model.md)
+[![Previous Step](https://img.shields.io/badge/Previous-121212.svg?logo=github&style=for-the-badge)](../training-model.md)
