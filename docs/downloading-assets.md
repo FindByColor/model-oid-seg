@@ -6,7 +6,7 @@
 
 > The following steps need to be done in order:
 
-NOTE: You only need to complete this step if you are rebuilding the training assets. If they have already been created, and you have a link to the S3 archive, you are good to go on to the next steps.
+**NOTE:** You only need to complete this step if you are rebuilding the training assets. If they have already been created, and you have a link to the S3 archive, you are good to go on to the next steps.
 
 This process will take a while, perhaps an entire day.
 
