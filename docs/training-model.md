@@ -45,3 +45,7 @@ If for some reason the training process gets interrupted, you can pick up from t
 ```bash
 python resume.py
 ```
+
+---
+
+[![Previous Step](https://img.shields.io/badge/README-121212.svg?logo=github&style=for-the-badge)](../downloading-assets.md) &nbsp; [![Next Step](https://img.shields.io/badge/Next_Step-1aa0db.svg?logo=github&style=for-the-badge)](./testing-model.md)

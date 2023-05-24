@@ -53,3 +53,7 @@ Now that we know which images we need, we can download them.
 python download_images.py train
 python download_images.py validation
 ```
+
+---
+
+[![Previous Step](https://img.shields.io/badge/README-121212.svg?logo=github&style=for-the-badge)](../README.md) &nbsp; [![Next Step](https://img.shields.io/badge/Next_Step-1aa0db.svg?logo=github&style=for-the-badge)](./training-model.md)

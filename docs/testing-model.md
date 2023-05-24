@@ -37,7 +37,7 @@ This will create a new folder in `./runs/segment/predict` ( each time you run th
 You can adjust the confidence of the prediction by passing in a `--confidence` of `-c` flag ( 0.0 - 1.0 ):
 
 * Lower confidence has more predictions returned, but less accurate
-* Higher confidence has left predictions returned, but more accurate
+* Higher confidence has less predictions returned, but more accurate
 
 ```bash
 python predict.py --confidence 0.25
@@ -50,3 +50,7 @@ You can pass in any image you want to test.  We recommend using an absolute path
 ```bash
 python predict.py --image /path/to/image.jpg
 ```
+
+---
+
+[![Previous Step](https://img.shields.io/badge/README-121212.svg?logo=github&style=for-the-badge)](../training-model.md)

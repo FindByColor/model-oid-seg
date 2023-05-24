@@ -47,3 +47,7 @@ clearml-init
 ```bash
 sudo apt install python3.9-venv
 ```
+
+---
+
+[![Previous Step](https://img.shields.io/badge/README-121212.svg?logo=github&style=for-the-badge)](../README.md) &nbsp; [![Next Step](https://img.shields.io/badge/Next_Step-1aa0db.svg?logo=github&style=for-the-badge)](./downloading-assets.md)
