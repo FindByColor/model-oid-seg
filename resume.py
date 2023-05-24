@@ -11,12 +11,16 @@ def main():
     print("› Resuming: {}".format(start_time.strftime("%Y-%m-%d %H:%M:%S")))
 
     # Create Task for ClearML
-    task = Task.init(project_name="Find By Color", task_name="Segmentation Model")
+    task = Task.init(
+        project_name="Find By Color",
+        task_name="Segmentation Model",
+        continue_last_task=True,
+    )
 
     # Load the last model from previous training session
     model = YOLO("./runs/segment/train/weights/last.pt")
 
-    # Restart training from lasy training point
+    # Restart training from last training point
     model.train(resume=True)
 
     # Close ClearML Task

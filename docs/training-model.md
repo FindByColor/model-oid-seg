@@ -12,13 +12,13 @@ python train.py nano
 
 **Size Options:** `nano | small | medium | large | extralarge`
 
-Size         | Model            | mAP<sup>box</sup> | mAP<sup>mask</sup> | Speed CPU ONNX | Speed A100 TensorRT | Params | FLOPs
--------------|------------------|-------------------|--------------------|----------------|---------------------|--------|--------
-`nano`       | [yolov8n-seg.pt] | 36.7              | 30.5               | 96.1 ms        | 1.21 ms             | 3.4 M  | 12.6 B
-`small`      | [yolov8s-seg.pt] | 44.6              | 36.8               | 155.7 ms       | 1.47 ms             | 11.8 M | 42.6 B
-`medium`     | [yolov8m-seg.pt] | 49.9              | 40.8               | 317.0 ms       | 2.18 ms             | 27.3 M | 110.2 B
-`large`      | [yolov8l-seg.pt] | 52.3              | 42.6               | 572.4 ms       | 2.79 ms             | 46.0 M | 220.5 B
-`extralarge` | [yolov8x-seg.pt] | 53.4              | 43.4               | 712.1 ms       | 4.02 ms             | 71.8 M | 344.1 B
+Size         | Model            | Depth Scale | Width Scale | Max Channels | mAP<sup>box</sup> | mAP<sup>mask</sup> | Speed CPU ONNX | Speed A100 TensorRT | Params | FLOPs
+-------------|------------------|-------------|-------------|--------------|-------------------|--------------------|----------------|---------------------|--------|--------
+`nano`       | [yolov8n-seg.pt] | 0.33        | 0.25        | 1024         | 36.7              | 30.5               | 96.1 ms        | 1.21 ms             | 3.4 M  | 12.6 B
+`small`      | [yolov8s-seg.pt] | 0.33        | 0.50        | 1024         | 44.6              | 36.8               | 155.7 ms       | 1.47 ms             | 11.8 M | 42.6 B
+`medium`     | [yolov8m-seg.pt] | 0.67        | 0.75        | 768          | 49.9              | 40.8               | 317.0 ms       | 2.18 ms             | 27.3 M | 110.2 B
+`large`      | [yolov8l-seg.pt] | 1.00        | 1.00        | 512          | 52.3              | 42.6               | 572.4 ms       | 2.79 ms             | 46.0 M | 220.5 B
+`extralarge` | [yolov8x-seg.pt] | 1.00        | 1.25        | 512          | 53.4              | 43.4               | 712.1 ms       | 4.02 ms             | 71.8 M | 344.1 B
 
 * **mAP<sup>val</sup>** values are for single-model single-scale on [COCO val2017](https://docs.ultralytics.com/tasks/segment/#train:~:text=single%2Dscale%20on-,COCO%20val2017,-dataset.%0AReproduce) dataset.
 * **Speed** averaged over COCO val images using an [Amazon EC2 P4d](https://aws.amazon.com/ec2/instance-types/p4/) instance.

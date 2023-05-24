@@ -1,36 +1,42 @@
 #!/usr/bin/python
 
+import csv
 import os
 
-from classifications import get_class, get_label
 from datetime import datetime
 
 from src.config import DEBUG, DIR_MASKS, DIR_META
 from src.mask_types import MaskTypes
-from src.utils import count_files, flush_spacer
+from src.oid import get_oid_label
+from src.utils import count_files, flush_spacer, get_folder
 
 import argparse
 import os
 import json
 
+total = 0
+
+
 def main(args):
     count = 0
-    total = 0
     class_codes = []
     class_stats = {}
+    csv_data = []
 
     if DEBUG is True:
         start_time = datetime.now()
         print("› Loading Masks ...", end="\r", flush=True)
 
-    mask_type = args["type"]
+    # Make meta folder if it is not already present
+    os.makedirs(DIR_META, exist_ok=True)
 
-    if mask_type == "validation":
-        mask_type = "val"
+    # Define folder name
+    folder_name = get_folder(args["type"])
 
-    mask_folder = os.path.join(DIR_MASKS, mask_type)
+    # Define download folder path
+    download_folder = os.path.join(DIR_MASKS, folder_name)
 
-    for f in os.listdir(mask_folder):
+    for f in os.listdir(download_folder):
         if f.lower().endswith((".png")):
             count += 1
 
@@ -53,14 +59,17 @@ def main(args):
                 code = code.replace("oi", "/oi/", 1)
 
             # get class ID from label
-            id = get_class(code)
-            label = get_label(code)
+            label = get_oid_label(code)
 
             if label not in class_stats:
                 class_codes.append(code)
-                class_stats[label] = 0
+                class_stats[label] = {
+                    "code": code,
+                    "label": label,
+                    "count": 0,
+                }
 
-            class_stats[label] += 1
+            class_stats[label]["count"] += 1
 
             if DEBUG is True:
                 time_elapsed = datetime.now() - start_time
@@ -73,10 +82,27 @@ def main(args):
                     flush=True,
                 )
 
-    # Serializing json
+    # Sort Data
     class_codes.sort()
-    json_class_stats = json.dumps(dict(sorted(class_stats.items())), indent=4)
-    json_class_codes = json.dumps(class_codes, indent=4)
+    json_sorted = dict(sorted(class_stats.items()))
+    json_class_stats = json.dumps(json_sorted, indent=2)
+    json_class_codes = json.dumps(class_codes, indent=2)
+
+    # Add sorted data to CSV
+    row_num = 0
+    for row in json_sorted:
+        json_sorted[row]["id"] = row_num
+        csv_data.append(json_sorted[row])
+        row_num += 1
+
+    fields = ["id", "code", "label", "count"]
+
+    with open(
+        "{}/{}-stats.csv".format(DIR_META, args["type"]), "w", newline=""
+    ) as outfile:
+        writer = csv.DictWriter(outfile, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows(csv_data)
 
     # Write Class Names Used
     with open("{}/{}-stats.json".format(DIR_META, args["type"]), "w") as outfile:

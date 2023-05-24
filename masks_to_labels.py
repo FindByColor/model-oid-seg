@@ -1,36 +1,45 @@
 #!/usr/bin/python
 
+import argparse
 import cv2
+import shutil
 import os
 
-from classifications import get_class
 from datetime import datetime
 
-from src.config import DEBUG
+from src.config import DEBUG, DIR_MASKS, DIR_LABELS
 from src.mask_types import MaskTypes
-from src.utils import count_files, flush_spacer
+from src.oid import fbc_class_id
+from src.utils import count_files, get_folder, flush_spacer
 
-import argparse
-import os
+total = 0
 
-input_dir = "./data/masks"
-output_dir = "./data/labels"
 
 def main(args):
     count = 0
-    total = 0
 
     if DEBUG is True:
         start_time = datetime.now()
         print("› Loading Masks ...", end="\r", flush=True)
 
-    mask_type = args["type"]
+    # Define folder name
+    folder_name = get_folder(args["type"])
 
-    if mask_type == "validation":
-        mask_type = "val"
+    # Define folder paths
+    mask_folder = os.path.join(DIR_MASKS, folder_name)
+    label_folder = os.path.join(DIR_LABELS, folder_name)
 
-    mask_folder = os.path.join(input_dir, mask_type)
-    label_folder = os.path.join(output_dir, mask_type)
+    # Delete download folder if it already exists
+    if os.path.exists(label_folder):
+        try:
+            print("Deleting Existing Label Folder ... ( this may take a while )")
+            shutil.rmtree(label_folder)
+        except OSError as e:
+            print("Error: %s - %s." % (e.filename, e.strerror))
+
+    # Make label folders if they are not already present
+    os.makedirs(DIR_LABELS, exist_ok=True)
+    os.makedirs(label_folder, exist_ok=True)
 
     for f in os.listdir(mask_folder):
         if f.lower().endswith((".png")):
@@ -58,7 +67,12 @@ def main(args):
                 class_label = class_label.replace("oi", "/oi/", 1)
 
             # get class ID from label
-            class_id = get_class(class_label)
+            class_id = fbc_class_id(class_label)
+
+            # If there was no class ID found, delete this image
+            if class_id is None:
+                os.remove(image_path)
+                continue
 
             # load the binary mask and get its contours
             mask = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
@@ -117,7 +131,7 @@ if __name__ == "__main__":
 
     try:
         args = vars(parser.parse_args())
-        total = count_files(input_dir, args["type"])
+        total = count_files(DIR_MASKS, args["type"])
         main(args)
     except KeyboardInterrupt:
         print(flush_spacer(100), end="\r", flush=True)
