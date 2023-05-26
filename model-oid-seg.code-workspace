@@ -8,14 +8,17 @@
     "cSpell.words": [
       "boto3",
       "botocore",
+      "chunksize",
       "clearml",
       "CUDA",
+      "extractall",
       "extralarge",
       "imgsz",
       "imread",
       "libbz",
       "lzma",
       "ONNX",
+      "pathlib",
       "preconfigured",
       "pretrained",
       "probs",
@@ -26,7 +29,8 @@
       "ultralytics",
       "venv",
       "YOLO",
-      "yolov"
+      "yolov",
+      "zipfile"
     ],
     "python.testing.pytestArgs": ["."],
     "python.testing.unittestEnabled": false,

@@ -1,5 +1,8 @@
 # Desc: Configuration file for project
 
+# Our S3 bucket name
+AWS_S3_BUCKET = "fbc-ml-dataset"
+
 # Debug mode
 DEBUG = True
 
