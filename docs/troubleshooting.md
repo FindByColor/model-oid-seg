@@ -45,7 +45,6 @@ The quickest way to tell if Live Share is broken ( sadly, it happens more than i
 sudo apt-get install lzma
 sudo apt-get install liblzma-dev
 sudo apt-get install libbz2-dev
-
-sudo cp /usr/lib/python3.9/lib-dynload/_bz2.cpython-39-x86_64-linux-gnu.so /usr/local/lib/python3.9/
-sudo cp /usr/lib/python3.9/lib-dynload/_lzma.cpython-39-x86_64-linux-gnu.so /usr/local/lib/python3.9/
 ```
+
+After running the following, if you are using a `venv` session, you will need to `deactivate` and start the session over.

@@ -8,7 +8,7 @@
 
 **Requirements**:
 
--   [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [X] [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 ## New Container
 
@@ -29,3 +29,7 @@ docker run --name fbc model-oid-seg python3 get_masks.py train
 ### Run Docker in CUDA Mode
 
 If you are on a high-end computer with an Nvidia Graphics Card that supports CUDA, you can add the `--gpus=all` to `docker run` to enable CUDA support.  Just replace `docker run` with `docker run --gpus=all`
+
+---
+
+[![Previous Step](https://img.shields.io/badge/README-121212.svg?logo=github&style=for-the-badge)](../README.md) &nbsp; [![Next Step](https://img.shields.io/badge/Next_Step-1aa0db.svg?logo=github&style=for-the-badge)](./downloading-assets.md)

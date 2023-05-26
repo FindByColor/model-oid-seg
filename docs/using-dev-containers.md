@@ -24,3 +24,7 @@ Unlike Docker, you can use VS Code's built in terminal to run NPM Commands just 
 
 1. Install [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install) _( Docker needs this installed )_
 2. When installing Docker Desktop below, make sure to leave `Install required Windows components for WSL 2` checked
+
+---
+
+[![Previous Step](https://img.shields.io/badge/README-121212.svg?logo=github&style=for-the-badge)](../README.md) &nbsp; [![Next Step](https://img.shields.io/badge/Next_Step-1aa0db.svg?logo=github&style=for-the-badge)](./downloading-assets.md)

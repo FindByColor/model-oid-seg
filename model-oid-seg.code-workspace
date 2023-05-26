@@ -1,0 +1,60 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "cSpell.words": [
+      "boto3",
+      "botocore",
+      "chunksize",
+      "clearml",
+      "CUDA",
+      "extractall",
+      "extralarge",
+      "imgsz",
+      "imread",
+      "libbz",
+      "lzma",
+      "ONNX",
+      "pathlib",
+      "preconfigured",
+      "pretrained",
+      "probs",
+      "publickey",
+      "strerror",
+      "tensorboard",
+      "tqdm",
+      "ultralytics",
+      "venv",
+      "YOLO",
+      "yolov",
+      "zipfile"
+    ],
+    "python.testing.pytestArgs": ["."],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.formatting.provider": "none",
+    "python.linting.mypyEnabled": true,
+    "python.linting.enabled": true,
+    "[python]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "editor.formatOnSave": true,
+    "files.exclude": {
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/CVS": true,
+      "**/.DS_Store": true,
+      "**/Thumbs.db": true,
+      "**/.mypy_cache": true,
+      "venv": true,
+      ".dockerignore": true,
+      "Dockerfile": true
+    },
+    "explorerExclude.backup": {}
+  }
+}

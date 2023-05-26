@@ -1,7 +1,10 @@
+__pycache__
 .git
 .github
 data
+masks
 meta
-runs
+model-oid-seg.workspace
 README.md
+runs
 venv
