@@ -1,5 +1,6 @@
 boto3
 clearml
+inquirer
 opencv-python
 tensorboard
 tqdm

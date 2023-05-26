@@ -3,6 +3,8 @@ data
 masks
 meta
 runs
+*.zip
+*.pt
 
 # mypy
 .mypy_cache/

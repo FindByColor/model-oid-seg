@@ -9,12 +9,12 @@ from src.mask_types import MaskTypes
 from src.utils import count_files, get_folder, flush_spacer
 
 batch = 100
+total = 0
 
 
 def main(args):
     # Setup Progress Tracking
     count = 0
-    total = 0
 
     # Store IDs
     ids = []
@@ -23,8 +23,11 @@ def main(args):
         start_time = datetime.now()
         print("› Loading Masks ...", end="\r", flush=True)
 
-    # Define mask folder name
-    mask_folder = get_folder(args["type"])
+    # Define folder name
+    folder_name = get_folder(args["type"])
+
+    # Define folder path
+    mask_folder = os.path.join(DIR_MASKS, folder_name)
 
     # Make meta folder if it is not already present
     os.makedirs(DIR_META, exist_ok=True)
@@ -36,7 +39,6 @@ def main(args):
     if os.path.isfile(list_file):
         os.remove(list_file)
 
-    mask_folder = os.path.join(DIR_MASKS, mask_folder)
     with open(list_file, "a") as list:
         for f in os.listdir(mask_folder):
             if f.lower().endswith((".png")):

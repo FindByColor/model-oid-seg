@@ -8,13 +8,13 @@
 
 **NOTE:** You only need to complete this step if you are rebuilding the training assets. If they have already been created, and you have a link to the S3 archive, you are good to go on to the next steps.
 
-This process will take a while, perhaps an entire day.
+This process will take a long time, as in a 2-3 days. Just converting the masks takes about 32 hours.
 
 - [X] `2,711,388` segmentation mask PNGs are downloaded for `train` and `validation`
-- [X] `2,711,388` masks are converted into YOLOv8 labels using binary contours
-- [X] `1,514,164` masks are removed because we don't actually want to train with them `*`
-- [X] `TBD` training images are downloaded that were used when creating the segmentation masks
-- [X] `TBD` images and `TBD` labels are then packaged up into a zip file and sent off to an S3 bucket
+- [X] `2,711,388` masks are processed into YOLOv8 labels using binary contours
+- [X] `2,189,930` masks are removed because we don't actually want to train with them `*`
+- [X] `521,458` training images are downloaded that were used when creating the segmentation masks
+- [X] `521,458` images and `521,458` labels are then packaged up into a zip file and sent off to an S3 bucket
 
 `*` Google does not provide a way to download just the segmentation masks we care about.  We have to download them all as zip files and pick the ones we want using the file's naming convention. That's also how we figure out which image IDs we need to download later for training.
 
@@ -52,6 +52,14 @@ Now that we know which images we need, we can download them.
 ```bash
 python download_images.py train
 python download_images.py validation
+```
+
+## Step 5. Archive Training Data
+
+Last thing we need to do is package up our training data and upload it to our AWS S3 bucket.
+
+```bash
+python archive_data.py
 ```
 
 ---

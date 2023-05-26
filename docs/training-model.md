@@ -4,6 +4,16 @@
 
 # Training the Model
 
+## Build Config File
+
+Before we can train our model, we need to create a config fle.
+
+```bash
+python create_config.py
+```
+
+## Start Training
+
 Once everything is setup, you can start training the model:
 
 ```bash

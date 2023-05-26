@@ -12,19 +12,24 @@ from src.utils import count_files, flush_spacer, get_folder
 
 import argparse
 import os
-import json
 
 total = 0
 
 
 def main(args):
-    count = 0
-    class_codes = []
     class_stats = {}
     csv_data = []
+    unique_images = []
+
+    masks = 0
+    percent = 0
+    time_elapsed = 0
 
     if DEBUG is True:
         start_time = datetime.now()
+        print(
+            "› Starting Validation: {}".format(start_time.strftime("%Y-%m-%d %H:%M:%S"))
+        )
         print("› Loading Masks ...", end="\r", flush=True)
 
     # Make meta folder if it is not already present
@@ -38,14 +43,14 @@ def main(args):
 
     for f in os.listdir(download_folder):
         if f.lower().endswith((".png")):
-            count += 1
+            masks += 1
 
-            # get data from file name
+            # Get data from file name
             uuid = f.replace(".png", "", 1)
             image_id = uuid.split("_", 1)[0]
             segment_id = uuid.rpartition("_")[-1]
 
-            # generate class ID
+            # Generate class ID
             code = uuid.replace(image_id + "_", "")
             code = code.replace("_" + segment_id, "")
 
@@ -58,45 +63,51 @@ def main(args):
             elif code[0] == "o" and code[1] == "i":
                 code = code.replace("oi", "/oi/", 1)
 
-            # get class ID from label
+            # Get class ID from label
             label = get_oid_label(code)
 
+            # Create class stats
             if label not in class_stats:
-                class_codes.append(code)
                 class_stats[label] = {
                     "code": code,
                     "label": label,
-                    "count": 0,
+                    "masks": 0,
+                    "images": 0,
                 }
 
-            class_stats[label]["count"] += 1
+            # Update mask count
+            class_stats[label]["masks"] += 1
+
+            # Add image to unique images
+            if image_id not in unique_images:
+                unique_images.append(image_id)
+                class_stats[label]["images"] += 1
 
             if DEBUG is True:
                 time_elapsed = datetime.now() - start_time
-                percent = (count / total) * 100
+                percent = (masks / total) * 100
                 print(
                     "› {:.2f}%: {}/{} ({}) {}".format(
-                        percent, count, total, time_elapsed, flush_spacer(25)
+                        percent, masks, total, time_elapsed, flush_spacer(25)
                     ),
                     end="\r",
                     flush=True,
                 )
 
     # Sort Data
-    class_codes.sort()
-    json_sorted = dict(sorted(class_stats.items()))
-    json_class_stats = json.dumps(json_sorted, indent=2)
-    json_class_codes = json.dumps(class_codes, indent=2)
+    sorted_data = dict(sorted(class_stats.items()))
 
     # Add sorted data to CSV
     row_num = 0
-    for row in json_sorted:
-        json_sorted[row]["id"] = row_num
-        csv_data.append(json_sorted[row])
+    for row in sorted_data:
+        sorted_data[row]["id"] = row_num
+        csv_data.append(sorted_data[row])
         row_num += 1
 
-    fields = ["id", "code", "label", "count"]
+    # Define CSV Fields
+    fields = ["id", "code", "label", "masks", "images"]
 
+    # Write CSV
     with open(
         "{}/{}-stats.csv".format(DIR_META, args["type"]), "w", newline=""
     ) as outfile:
@@ -104,13 +115,13 @@ def main(args):
         writer.writeheader()
         writer.writerows(csv_data)
 
-    # Write Class Names Used
-    with open("{}/{}-stats.json".format(DIR_META, args["type"]), "w") as outfile:
-        outfile.write(json_class_stats)
-
-    # Write Class Codes Used
-    with open("{}/{}-codes.json".format(DIR_META, args["type"]), "w") as outfile:
-        outfile.write(json_class_codes)
+    if DEBUG is True:
+        print("› Completed: {}".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        print(
+            "› {:.2f}%: {}/{} ({}) {}".format(
+                percent, masks, total, time_elapsed, flush_spacer(25)
+            )
+        )
 
 
 if __name__ == "__main__":
