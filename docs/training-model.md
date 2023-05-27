@@ -53,7 +53,7 @@ args = dict(data='config.yaml', epochs=100, imgsz=640)
 If for some reason the training process gets interrupted, you can pick up from the last saved Epoch by running the following:
 
 ```bash
-python resume.py
+python resume.py nano
 ```
 
 ---

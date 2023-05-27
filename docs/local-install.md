@@ -13,7 +13,6 @@ python3 -m venv venv
 source venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
-python -m pip install -r requirements-dev.txt
 ```
 
 Since we are using Python 3.9, you may need to specify the version of python when creating the virtual environment:
@@ -32,7 +31,7 @@ deactivate
 
 > We are using [ClearML](https://app.clear.ml/) as a tool to evaluate trained models, so you'll need to connect your account:
 
-After installing all the Python dependencies, you can connect to your ClearML account in terminal: 
+After installing all the Python dependencies, you can connect to your ClearML account in terminal.
 
 NOTE: You only need to do this once.  If you are not sure if you have done this already, check for a `~/clearml.conf` file.
 

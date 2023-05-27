@@ -3,6 +3,7 @@
 import argparse
 import enum
 import tensorboard
+import torch
 
 from clearml import Task
 from datetime import datetime
@@ -34,6 +35,11 @@ def main(arg):
     # Create Task for ClearML
     task = Task.init(project_name="Find By Color", task_name="Segmentation Model")
 
+    if torch.cuda.is_available():
+        device = "0"
+    else:
+        device = "cpu"
+
     # Get Model Size
     model_name = models[arg["size"]]
 
@@ -41,7 +47,17 @@ def main(arg):
     model = YOLO(model_name)
 
     # Define Args for both YOLO and ClearML
-    args = dict(data="config.yaml", epochs=100, imgsz=640)
+    args = dict(
+        data="config.yaml",
+        device=device,
+        epochs=100,
+        exist_ok=True,
+        imgsz=640,
+        name="fbc-seg-{}".format(arg["size"][0]),
+        project="fbc-ml-models",
+        resume=False,
+        verbose=True,
+    )
 
     # Connect Args to YOLO
     task.connect(args)

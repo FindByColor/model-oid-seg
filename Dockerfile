@@ -17,7 +17,6 @@ COPY get_masks.py get_masks.py
 COPY get_stats.py get_stats.py
 COPY masks_to_labels.py masks_to_labels.py
 COPY predict.py predict.py
-COPY requirements-dev.txt requirements-dev.txt
 COPY requirements.txt requirements.txt
 COPY resume.py resume.py
 COPY test-image.jpg test-image.jpg
@@ -33,4 +32,3 @@ RUN apt-get update && apt-get install -y build-essential curl software-propertie
 # Install Python Dependencies
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
-RUN pip3 install -r requirements-dev.txt

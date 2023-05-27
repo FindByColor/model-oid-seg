@@ -1,10 +1,11 @@
+*.pt
+*.zip
 config.yaml
 data
+fbc-ml-models
 masks
 meta
 runs
-*.zip
-*.pt
 
 # mypy
 .mypy_cache/
