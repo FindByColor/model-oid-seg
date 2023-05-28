@@ -48,3 +48,50 @@ sudo apt-get install libbz2-dev
 ```
 
 After running the following, if you are using a `venv` session, you will need to `deactivate` and start the session over.
+
+## Training Fails with 'killed process'
+
+I found this can happen if you do not have a swap file in place that can be used for temp storage.  My research found that this needs to be around 64GB to prevent issues:
+
+You can configure a swap file using the following:
+
+```bash
+sudo swapoff /swapfile
+sudo fallocate -l 64G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+```
+
+Then you can verify things are working with:
+
+```
+sudo swapon --show
+```
+
+This shoudl show something like:
+
+```
+NAME      TYPE SIZE  USED PRIO
+/swapfile file  64G 39.1G   -2
+```
+
+If you are using this computer a lot for training, you might want to make this swap file permanent:
+
+```bash
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+```
+
+Another option you can try, if you are on a linux distro and you know your computer has a lot of memory, sometimes processes are killed because of an `overcommit` rule is tripped.
+
+You can disable this by using:
+
+```bash
+sudo echo 1 > /proc/sys/vm/overcommit_memory
+```
+
+It is not recommended to leave it that way though, so set it back to `0` after training if this resolved your issue:
+
+```bash
+sudo echo 1 > /proc/sys/vm/overcommit_memory
+```
