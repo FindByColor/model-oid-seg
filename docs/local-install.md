@@ -39,7 +39,7 @@ NOTE: You only need to do this once.  If you are not sure if you have done this 
 clearml-init
 ```
 
-## Windows WSL:
+## Windows WSL
 
 > You will likely need to run this command before you can run the install process ( replace `3.9` in `python3.9-venv` with your machines version of python )
 

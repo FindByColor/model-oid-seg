@@ -2,6 +2,7 @@
 
 import os
 import threading
+import shutil
 import sys
 
 from datetime import datetime
@@ -47,18 +48,19 @@ def check_credentials():
         return False
 
 
-def upload_to_s3(file):
+def upload_to_s3(file, key):
     """Upload to AWS S3 bucket
 
     Args:
         filename (str): Name of file to upload
+        key (str): Path for bucket
     """
     import boto3
     from boto3.s3.transfer import TransferConfig
 
     s3_client = boto3.client("s3")
 
-    print("Uploading to AWS S3 ... ( this may take a while )\n")
+    print("\nUploading to AWS S3 ...")
 
     config = TransferConfig(
         multipart_threshold=1024 * 25,
@@ -70,46 +72,73 @@ def upload_to_s3(file):
     s3_client.upload_file(
         file,
         AWS_S3_BUCKET,
-        "model-oid-seg/data.zip",
-        ExtraArgs={"ACL": "public-read", "ContentType": "application/zip"},
+        key,
+        ExtraArgs={"ContentType": "application/zip"},
         Config=config,
         Callback=ProgressPercentage(file),
     )
 
 
-def zip_folder(filename, target_dir):
-    """Zip Data Folder
+def archive_training(an):
+    """Zip Training Assets
 
     Args:
-        filename (str): Name of file to create
-        target_dir (str): Folder to zip
+        an (str): Alphanumeric character to zip
     """
-    import zipfile
 
-    count = 0
+    # Make meta folder if it is not already present
+    os.makedirs(".archive", exist_ok=True)
 
-    print("Compressing data folder ... ( this may take a while )\n")
+    print("\n\nTraining Images ( files that start with: '{an}' ) ...".format(an=an))
 
-    with zipfile.ZipFile(filename, "w", zipfile.ZIP_DEFLATED) as zip_obj:
-        root_len = len(target_dir) + 1
-        for base, dirs, files in os.walk(target_dir):
-            for file in files:
-                if file.lower().endswith((".cache")):
-                    continue
-                fn = os.path.join(base, file)
-                zip_obj.write(fn, fn[root_len:])
+    os.system(
+        "zip -rX .archive/train-images-{an}.zip data/images/train/{an}* 2>&1 | pv -lep -s $(ls -Rl1 data/images/train/{an}* | egrep -c '^[-/]') > /dev/null".format(
+            an=an
+        )
+    )
+    upload_to_s3(
+        os.path.realpath(".archive/train-images-{an}.zip".format(an=an)),
+        "model-oid-seg/train-images-{an}.zip".format(an=an),
+    )
 
-                if DEBUG is True:
-                    count += 1
-                    time_elapsed = datetime.now() - start_time
-                    percent = (count / total) * 100
-                    print(
-                        "› {:.2f}%: {}/{} ({}) {}".format(
-                            percent, count, total, time_elapsed, flush_spacer(25)
-                        ),
-                        end="\r",
-                        flush=True,
-                    )
+    print("\n\nTraining Labels ( files that start with '{an}' ) ...".format(an=an))
+
+    os.system(
+        "zip -rX .archive/train-labels-{an}.zip data/labels/train/{an}* 2>&1 | pv -lep -s $(ls -Rl1 data/labels/train/{an}* | egrep -c '^[-/]') > /dev/null".format(
+            an=an
+        )
+    )
+    upload_to_s3(
+        os.path.realpath(".archive/train-labels-{an}.zip".format(an=an)),
+        "model-oid-seg/train-labels-{an}.zip".format(an=an),
+    )
+
+
+def archive_validation():
+    """Zip Validation Assets"""
+
+    # Make meta folder if it is not already present
+    os.makedirs(".archive", exist_ok=True)
+
+    print("\n\nValidation Images ( all files ) ...")
+
+    os.system(
+        "zip -rX .archive/validation-images.zip data/images/val/* 2>&1 | pv -lep -s $(ls -Rl1 data/images/val/* | egrep -c '^[-/]') > /dev/null"
+    )
+    upload_to_s3(
+        os.path.realpath(".archive/validation-images.zip"),
+        "model-oid-seg/validation-images.zip",
+    )
+
+    print("\n\nValidation Labels ( all files ) ...")
+
+    os.system(
+        "zip -rX .archive/validation-labels.zip data/labels/val/* 2>&1 | pv -lep -s $(ls -Rl1 data/labels/val/* | egrep -c '^[-/]') > /dev/null"
+    )
+    upload_to_s3(
+        os.path.realpath(".archive/validation-labels.zip"),
+        "model-oid-seg/validation-labels.zip",
+    )
 
 
 def main():
@@ -120,9 +149,37 @@ def main():
 
     # Make sure AWS credentials are present
     if check_credentials() is True:
-        filename = "data.zip"
-        zip_folder(filename, data_dir)
-        upload_to_s3(os.path.realpath(filename))
+        # Zip validation data
+        archive_validation()
+
+        # Zip training data by alphanumeric first character
+        codes = [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "a",
+            "b",
+            "c",
+            "d",
+            "e",
+            "f",
+        ]
+        for an in codes:
+            archive_training(an)
+
+        # Delete temp folder we created
+        if os.path.exists(os.path.realpath(".archive")):
+            try:
+                shutil.rmtree(os.path.realpath(".archive"))
+            except OSError as e:
+                print("Error: %s - %s." % (e.filename, e.strerror))
     else:
         print("AWS credentials not found: ~/.aws/credentials")
         print("Run `python aws_setup.py` to setup AWS credentials")

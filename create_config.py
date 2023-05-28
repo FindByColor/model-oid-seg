@@ -38,22 +38,9 @@ def generate_download(answers):
         download = """
 # Download from FBC S3 Bucket
 download: |
-  import boto3
-  import os
-
-  from pathlib import Path
-  from zipfile import ZipFile
-
-  dir = Path(yaml["path"])
-
-  s3 = boto3.resource("s3")
-  s3.meta.client.download_file("fbc-ml-dataset", "model-oid-seg/data.zip", "data.zip")
-
-  with ZipFile("data.zip", "r") as zObject:
-      zObject.extractall(path=dir)
-
-  zObject.close()
-  os.remove(save_path)
+  from aws_download import get_training_data
+  
+  get_training_data()
 """
     else:
         download = ""
@@ -76,27 +63,14 @@ def data_location_validation(answers, current):
     return True
 
 
-def autocomplete_fn(_text, state):
-    urls = ["https://fbc-ml-dataset.s3.amazonaws.com/model-oid-seg/data.zip"]
-    return urls[state % len(urls)]
-
-
 def main():
     # Check where data is located
     questions = [
         inquirer.List(
             "data_location",
             message="Training Assets",
-            choices=["Download from AWS", "Download from URL", "Already Installed"],
+            choices=["Download from AWS", "Already Installed"],
             validate=data_location_validation,
-        ),
-        inquirer.Text(
-            "download_url",
-            message="Download URL ( TAB to autocomplete )",
-            autocomplete=autocomplete_fn,
-            validate=lambda _, x: x.startswith("https://"),
-            ignore=lambda x: x["data_location"] == "Already Installed"
-            or x["data_location"] == "Download from AWS",
         ),
     ]
 

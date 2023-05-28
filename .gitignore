@@ -1,3 +1,5 @@
+.archive
+.temp
 *.pt
 *.zip
 config.yaml
