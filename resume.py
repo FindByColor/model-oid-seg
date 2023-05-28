@@ -52,9 +52,7 @@ def main(arg):
     task.connect(args)
 
     # Load the last model from previous training session
-    model = YOLO(
-        "./fbc-ml-models/fbc-seg-{}/train/weights/last.pt".format(arg["size"][0])
-    )
+    model = YOLO("fbc-ml-models/fbc-seg-{}/weights/last.pt".format(arg["size"][0]))
 
     # Restart training from last training point
     model.train(**args)

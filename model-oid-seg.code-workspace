@@ -32,7 +32,9 @@
       "yolov",
       "zipfile"
     ],
-    "python.testing.pytestArgs": ["."],
+    "python.testing.pytestArgs": [
+      "."
+    ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "python.formatting.provider": "none",
@@ -44,28 +46,21 @@
     },
     "editor.formatOnSave": true,
     "files.exclude": {
-      "**/.git": false,
-      "**/.svn": false,
-      "**/.hg": false,
-      "**/CVS": false,
-      "**/.DS_Store": false,
-      "**/Thumbs.db": false,
-      "**/.mypy_cache": false,
-      "venv": false,
-      ".dockerignore": false,
-      "Dockerfile": false
-    },
-    "explorerExclude.backup": {
-      "**/.git": true,
-      "**/.svn": true,
-      "**/.hg": true,
-      "**/CVS": true,
-      "**/.DS_Store": true,
-      "**/Thumbs.db": true,
-      "**/.mypy_cache": true,
-      "venv": true,
+      "__pycache__": true,
       ".dockerignore": true,
-      "Dockerfile": true
+      "*.pt": true,
+      "**/.DS_Store": true,
+      "**/.git": true,
+      "**/.hg": true,
+      "**/.mypy_cache": true,
+      "**/.svn": true,
+      "**/CVS": true,
+      "**/Thumbs.db": true,
+      "data": true,
+      "Dockerfile": true,
+      "masks": true,
+      "meta": true,
+      "venv": true
     }
   }
 }
