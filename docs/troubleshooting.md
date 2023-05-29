@@ -93,5 +93,5 @@ sudo echo 1 > /proc/sys/vm/overcommit_memory
 It is not recommended to leave it that way though, so set it back to `0` after training if this resolved your issue:
 
 ```bash
-sudo echo 1 > /proc/sys/vm/overcommit_memory
+sudo echo 0 > /proc/sys/vm/overcommit_memory
 ```
