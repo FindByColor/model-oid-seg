@@ -19,22 +19,15 @@ class ModelSizes(str, enum.Enum):
 
 epoch = 0
 last_epoch = 0
+last_run = None
 no_change_count = 0
 
 
 def main(arg):
     global epoch
     global last_epoch
+    global last_run
     global no_change_count
-
-    # Create Timer
-    start_time = datetime.now()
-    print(
-        "› Starting Test Sample Generation: {}".format(
-            start_time.strftime("%Y-%m-%d %H:%M:%S")
-        )
-    )
-    print("› Process will run every 5 Epochs\n")
 
     with open(
         "fbc-ml-models/fbc-seg-{}/results.csv".format(arg["size"][0]),
@@ -56,6 +49,13 @@ def main(arg):
                         epoch, current_time.strftime("%Y-%m-%d %H:%M:%S")
                     )
                 )
+
+                if last_run is not None:
+                    time_elapsed = current_time - last_run
+                    print("› Next Run ETA: {}".format(time_elapsed))
+
+                last_run = current_time
+
                 predict(arg)
         else:
             no_change_count += 1
@@ -108,6 +108,14 @@ if __name__ == "__main__":
     parser.add_argument("size", type=ModelSizes)
 
     try:
+        start_time = datetime.now()
+        print(
+            "› Starting Test Sample Generation: {}".format(
+                start_time.strftime("%Y-%m-%d %H:%M:%S")
+            )
+        )
+        print("› Process will run every 5 Epochs\n")
+
         main(vars(parser.parse_args()))
     except KeyboardInterrupt:
         print("Exited Application")
