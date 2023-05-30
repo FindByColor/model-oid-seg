@@ -4,6 +4,7 @@ import argparse
 import enum
 import os
 import pathlib
+import threading
 import torch
 
 from datetime import datetime
@@ -19,22 +20,15 @@ class ModelSizes(str, enum.Enum):
     extralarge = "extralarge"
 
 
+epoch = 0
+last_epoch = 0
+no_change_count = 0
+
+
 def main(arg):
-    # Make sure image exists before processing
-    if not os.path.exists(arg["image"].resolve()):
-        return print("❌ Unable to locate file: {}".format(arg["image"].resolve()))
-
-    # Create Timer
-    start_time = datetime.now()
-    print("› Starting Prediction: {}".format(start_time.strftime("%Y-%m-%d %H:%M:%S")))
-
-    if torch.cuda.is_available():
-        device = "0"
-    else:
-        device = "cpu"
-
-    # Load the last model from previous training session
-    model = YOLO("fbc-ml-models/fbc-seg-{}/weights/last.pt".format(arg["size"][0]))
+    global epoch
+    global last_epoch
+    global no_change_count
 
     with open(
         "fbc-ml-models/fbc-seg-{}/results.csv".format(arg["size"][0]),
@@ -43,7 +37,42 @@ def main(arg):
         errors="ignore",
     ) as scraped:
         final_line = scraped.readlines()[-1]
-        last_epoch = int(final_line.split(",")[0]) + 1
+        epoch = int(final_line.split(",")[0]) + 1
+
+        if epoch > last_epoch:
+            last_epoch = epoch
+            no_change_count = 0
+
+            if epoch % 5 == 0:
+                print("› Generating sample for epoch {}".format(epoch))
+                predict(arg)
+            else:
+                print("› Skipping Prediction ( epoch not divisible by 5 )")
+        else:
+            no_change_count += 1
+            print("› Epoch has not changed")
+
+    # Check how long it has been since the last change ( 120 minutes: 5 min * 24 runs = 120 )
+    if no_change_count < 24:
+        # Run again in 5 minutes ( 300 seconds )
+        threading.Timer(300.0, main, [arg]).start()
+    else:
+        # Exit Application
+        print("Exiting Application as no change has been detected in 120 minutes")
+        exit(0)
+
+
+def predict(arg):
+    global epoch
+
+    # Create Timer
+    if torch.cuda.is_available():
+        device = "0"
+    else:
+        device = "cpu"
+
+    # Load the last model from previous training session
+    model = YOLO("fbc-ml-models/fbc-seg-{}/weights/last.pt".format(arg["size"][0]))
 
     # Define Args for both YOLO and ClearML
     args = dict(
@@ -55,17 +84,11 @@ def main(arg):
         verbose=True,
         save=True,
         retina_masks=True,
-        conf=arg["confidence"],
+        conf=0.01,
     )
 
     # Perform object detection on an image using the newly trained model
-    model.predict(arg["image"].resolve(), **args)
-
-    # Output Run Time
-    end_time = datetime.now()
-    time_elapsed = end_time - start_time
-    print("› Completed: {}".format(end_time.strftime("%Y-%m-%d %H:%M:%S")))
-    print("› Total Time: {}".format(time_elapsed))
+    model.predict("samples".resolve(), **args)
 
 
 if __name__ == "__main__":
@@ -75,22 +98,6 @@ if __name__ == "__main__":
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("size", type=ModelSizes)
-    parser.add_argument(
-        "-i",
-        "--image",
-        type=pathlib.Path,
-        metavar="\b",
-        default="samples",
-        help="Absolute Image Path",
-    )
-    parser.add_argument(
-        "-c",
-        "--confidence",
-        type=range_confidence(0, 1),
-        metavar="\b",
-        default=0.01,
-        help="Prediction Confidence [0-1]",
-    )
 
     try:
         main(vars(parser.parse_args()))

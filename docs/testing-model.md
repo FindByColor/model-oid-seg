@@ -22,13 +22,15 @@ This will create a new folder in `./runs/segment/val` ( each time you run this, 
 
 > This is the fun part - Testing that the model works.
 
-We have a default `test-image.jpg` which will be used with a confidence of `0.25`.
+We have a default `samples` folder which will be used with a confidence of `0.01`.
 
 ```bash
-python predict.py
+python predict.py nano
 ```
 
-This will create a new folder in `./runs/segment/predict` ( each time you run this, a new folder is created, e.g. `predict` etc ).
+**Size Options:** `nano | small | medium | large | extralarge`
+
+This will create a new folder in `./predictions/fbc-seg-{size}-e{epoch}` where `{size}` is the first letter of the size, and `{epoch}` is the number of the last epoch that ran
 
 **CLI Options:**
 
