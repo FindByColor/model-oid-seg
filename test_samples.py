@@ -2,14 +2,11 @@
 
 import argparse
 import enum
-import os
-import pathlib
 import threading
 import torch
 
 from datetime import datetime
 from ultralytics import YOLO
-from src.utils import range_confidence
 
 
 class ModelSizes(str, enum.Enum):
@@ -30,6 +27,15 @@ def main(arg):
     global last_epoch
     global no_change_count
 
+    # Create Timer
+    start_time = datetime.now()
+    print(
+        "› Starting Test Sample Generation: {}".format(
+            start_time.strftime("%Y-%m-%d %H:%M:%S")
+        )
+    )
+    print("› Process will run every 5 Epochs\n")
+
     with open(
         "fbc-ml-models/fbc-seg-{}/results.csv".format(arg["size"][0]),
         "r",
@@ -44,13 +50,15 @@ def main(arg):
             no_change_count = 0
 
             if epoch % 5 == 0:
-                print("› Generating sample for epoch {}".format(epoch))
+                current_time = datetime.now()
+                print(
+                    "› Generating Samples from Epoch #{} {}".format(
+                        epoch, current_time.strftime("%Y-%m-%d %H:%M:%S")
+                    )
+                )
                 predict(arg)
-            else:
-                print("› Skipping Prediction ( epoch not divisible by 5 )")
         else:
             no_change_count += 1
-            print("› Epoch has not changed")
 
     # Check how long it has been since the last change ( 120 minutes: 5 min * 24 runs = 120 )
     if no_change_count < 24:
