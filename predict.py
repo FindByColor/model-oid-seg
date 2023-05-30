@@ -54,6 +54,9 @@ def main(arg):
         project="predictions",
         verbose=True,
         save=True,
+        save_txt=True,  # Save masks as .txt file
+        save_conf=True,  # save results with confidence scores
+        save_crop=True,  # save cropped images with results
         retina_masks=True,
         conf=arg["confidence"],
     )

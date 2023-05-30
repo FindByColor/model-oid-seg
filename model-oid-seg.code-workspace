@@ -44,6 +44,12 @@
       "editor.formatOnSave": true,
       "editor.defaultFormatter": "ms-python.black-formatter"
     },
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.profiles.linux": {
+      "zsh": {
+        "path": "/usr/bin/zsh"
+      }
+    },
     "editor.formatOnSave": true,
     "files.exclude": {
       "__pycache__": true,

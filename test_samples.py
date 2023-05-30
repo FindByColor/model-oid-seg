@@ -2,6 +2,7 @@
 
 import argparse
 import enum
+import os
 import threading
 import torch
 
@@ -44,11 +45,6 @@ def main(arg):
 
             if epoch % 5 == 0:
                 current_time = datetime.now()
-                print(
-                    "› Generating Samples from Epoch #{} {}".format(
-                        epoch, current_time.strftime("%Y-%m-%d %H:%M:%S")
-                    )
-                )
 
                 if last_run is not None:
                     time_elapsed = current_time - last_run
@@ -56,7 +52,16 @@ def main(arg):
 
                 last_run = current_time
 
-                predict(arg)
+                if not os.path.exists(
+                    "predictions/fbc-seg-{}-e{}".format(arg["size"][0], last_epoch)
+                ):
+                    print(
+                        "› Generating Samples from Epoch #{} {}".format(
+                            epoch, current_time.strftime("%Y-%m-%d %H:%M:%S")
+                        )
+                    )
+                    # Run Predictions
+                    predict(arg)
         else:
             no_change_count += 1
 
@@ -72,6 +77,10 @@ def main(arg):
 
 def predict(arg):
     global epoch
+
+    # Create Timer
+    start_time = datetime.now()
+    print("› Starting Predictions: {}".format(start_time.strftime("%Y-%m-%d %H:%M:%S")))
 
     # Create Timer
     if torch.cuda.is_available():
@@ -91,12 +100,21 @@ def predict(arg):
         project="predictions",
         verbose=True,
         save=True,
+        save_txt=False,  # Save masks as .txt file
+        save_conf=False,  # save results with confidence scores
+        save_crop=False,  # save cropped images with results
         retina_masks=True,
         conf=0.01,
     )
 
     # Perform object detection on an image using the newly trained model
-    model.predict("samples".resolve(), **args)
+    model.predict("samples", **args)
+
+    # Output Run Time
+    end_time = datetime.now()
+    time_elapsed = end_time - start_time
+    print("\n› Completed: {}".format(end_time.strftime("%Y-%m-%d %H:%M:%S")))
+    print("› Total Time: {}\n".format(time_elapsed))
 
 
 if __name__ == "__main__":
