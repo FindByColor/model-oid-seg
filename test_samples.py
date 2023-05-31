@@ -61,14 +61,14 @@ def main(arg):
                         )
                     )
                     # Run Predictions
-                    predict(arg)
+                    predict(vars(parser.parse_args()))
         else:
             no_change_count += 1
 
     # Check how long it has been since the last change ( 120 minutes: 5 min * 24 runs = 120 )
     if no_change_count < 24:
         # Run again in 5 minutes ( 300 seconds )
-        threading.Timer(300.0, main, [arg]).start()
+        threading.Timer(300.0, main, [vars(parser.parse_args())]).start()
     else:
         # Exit Application
         print("Exiting Application as no change has been detected in 120 minutes")
