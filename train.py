@@ -50,7 +50,7 @@ def main(arg):
     args = dict(
         data="config.yaml",
         device=device,
-        epochs=100,
+        epochs=500,
         exist_ok=True,
         imgsz=640,
         name="fbc-seg-{}".format(arg["size"][0]),
