@@ -2,6 +2,7 @@
 
 import argparse
 import enum
+import os
 import tensorboard
 import torch
 
@@ -9,6 +10,8 @@ from clearml import Task
 from datetime import datetime
 from src.utils import flush_spacer
 from ultralytics import YOLO
+
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
 
 models = {
     "nano": "yolov8n-seg.pt",

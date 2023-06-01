@@ -2,12 +2,15 @@
 
 import argparse
 import enum
+import os
 import tensorboard
 import torch
 
 from clearml import Task
 from datetime import datetime
 from ultralytics import YOLO
+
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
 
 
 class ModelSizes(str, enum.Enum):

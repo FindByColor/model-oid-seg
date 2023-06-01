@@ -3,8 +3,6 @@
 import argparse
 import enum
 import os
-import schedule
-import time
 import torch
 
 from datetime import datetime
@@ -19,67 +17,63 @@ class ModelSizes(str, enum.Enum):
     extralarge = "extralarge"
 
 
+debug = False
 epoch = 0
 last_epoch = 0
 last_run = None
-no_change_count = 0
 
 
-def check_epoch(arg):
+def main(arg):
     global epoch
     global last_epoch
     global last_run
-    global no_change_count
 
-    with open(
-        "fbc-ml-models/fbc-seg-{}/results.csv".format(arg["size"][0]),
-        "r",
-        encoding="utf-8",
-        errors="ignore",
-    ) as scraped:
-        final_line = scraped.readlines()[-1]
-        epoch = int(final_line.split(",")[0]) + 1
+    # Make sure file exists
+    if os.path.isfile("fbc-ml-models/fbc-seg-{}/results.csv".format(arg["size"][0])):
+        with open(
+            "fbc-ml-models/fbc-seg-{}/results.csv".format(arg["size"][0]),
+            "r",
+            encoding="utf-8",
+            errors="ignore",
+        ) as scraped:
+            final_line = scraped.readlines()[-1]
+            epoch = int(final_line.split(",")[0]) + 1
 
-        if epoch > last_epoch:
-            last_epoch = epoch
-            no_change_count = 0
+            if epoch > last_epoch:
+                last_epoch = epoch
 
-            if epoch % 10 == 0:
-                current_time = datetime.now()
+                if epoch % 10 == 0:
+                    current_time = datetime.now()
 
-                if last_run is not None:
-                    time_elapsed = current_time - last_run
-                    print("› Next Run ETA: {}".format(time_elapsed))
+                    if last_run is not None and debug is True:
+                        time_elapsed = current_time - last_run
+                        last_run = current_time
+                        print("› Next Run ETA: {}".format(time_elapsed))
 
-                last_run = current_time
-
-                if not os.path.exists(
-                    "predictions/fbc-seg-{}-e{}".format(arg["size"][0], last_epoch)
-                ):
-                    print(
-                        "› Generating Samples from Epoch #{} {}".format(
-                            epoch, current_time.strftime("%Y-%m-%d %H:%M:%S")
-                        )
-                    )
-                    # Run Predictions
-                    predict(vars(parser.parse_args()))
-        else:
-            no_change_count += 1
-
-    # Check how long it has been since the last change ( 120 minutes: 5 min * 24 runs = 120 )
-    if no_change_count >= 24:
-        # Exit Application
-        schedule.clear()
-        print("Exiting Application as no change has been detected in 120 minutes")
-        exit(0)
+                    if not os.path.exists(
+                        "predictions/fbc-seg-{}-e{}".format(arg["size"][0], last_epoch)
+                    ):
+                        if debug is True:
+                            print(
+                                "› Generating Samples from Epoch #{} {}".format(
+                                    epoch, current_time.strftime("%Y-%m-%d %H:%M:%S")
+                                )
+                            )
+                        # Run Predictions
+                        predict(vars(parser.parse_args()))
 
 
 def predict(arg):
     global epoch
 
     # Create Timer
-    start_time = datetime.now()
-    print("› Starting Predictions: {}".format(start_time.strftime("%Y-%m-%d %H:%M:%S")))
+    if debug is True:
+        start_time = datetime.now()
+        print(
+            "› Starting Predictions: {}".format(
+                start_time.strftime("%Y-%m-%d %H:%M:%S")
+            )
+        )
 
     # Create Timer
     if torch.cuda.is_available():
@@ -110,14 +104,11 @@ def predict(arg):
     model.predict("samples", **args)
 
     # Output Run Time
-    end_time = datetime.now()
-    time_elapsed = end_time - start_time
-    print("\n› Completed: {}".format(end_time.strftime("%Y-%m-%d %H:%M:%S")))
-    print("› Total Time: {}\n".format(time_elapsed))
-
-
-def main():
-    check_epoch(vars(parser.parse_args()))
+    if debug is True:
+        end_time = datetime.now()
+        time_elapsed = end_time - start_time
+        print("\n› Completed: {}".format(end_time.strftime("%Y-%m-%d %H:%M:%S")))
+        print("› Total Time: {}\n".format(time_elapsed))
 
 
 if __name__ == "__main__":
@@ -129,20 +120,18 @@ if __name__ == "__main__":
     parser.add_argument("size", type=ModelSizes)
 
     try:
-        start_time = datetime.now()
-        print(
-            "› Starting Test Sample Generation: {}".format(
-                start_time.strftime("%Y-%m-%d %H:%M:%S")
+        if debug is True:
+            start_time = datetime.now()
+            print(
+                "› Starting Test Sample Generation: {}".format(
+                    start_time.strftime("%Y-%m-%d %H:%M:%S")
+                )
             )
-        )
-        print("› Process will run every 5 Epochs\n")
+            print("› Process will run every 5 Epochs\n")
 
-        schedule.every(10).minutes.do(main)
-        while True:
-            schedule.run_pending()
-            time.sleep(60)
+        main(vars(parser.parse_args()))
 
     except KeyboardInterrupt:
-        schedule.clear()
-        print("Exited Application")
+        if debug is True:
+            print("Exited Application")
         exit(0)
