@@ -4,6 +4,7 @@ clearml
 inquirer
 mypy
 opencv-python
+schedule
 tensorboard
 torch
 tqdm

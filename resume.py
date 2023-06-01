@@ -39,12 +39,14 @@ def main(arg):
     args = dict(
         data="config.yaml",
         device=device,
-        epochs=500,
+        epochs=1000,
         exist_ok=True,
         imgsz=640,
         name="fbc-seg-{}".format(arg["size"][0]),
+        patience=50,
         project="fbc-ml-models",
         resume=True,
+        save_period=10,
         verbose=True,
     )
 

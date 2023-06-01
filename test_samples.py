@@ -3,7 +3,8 @@
 import argparse
 import enum
 import os
-import threading
+import schedule
+import time
 import torch
 
 from datetime import datetime
@@ -24,7 +25,7 @@ last_run = None
 no_change_count = 0
 
 
-def main(arg):
+def check_epoch(arg):
     global epoch
     global last_epoch
     global last_run
@@ -43,7 +44,7 @@ def main(arg):
             last_epoch = epoch
             no_change_count = 0
 
-            if epoch % 5 == 0:
+            if epoch % 10 == 0:
                 current_time = datetime.now()
 
                 if last_run is not None:
@@ -66,11 +67,9 @@ def main(arg):
             no_change_count += 1
 
     # Check how long it has been since the last change ( 120 minutes: 5 min * 24 runs = 120 )
-    if no_change_count < 24:
-        # Run again in 5 minutes ( 300 seconds )
-        threading.Timer(300.0, main, [vars(parser.parse_args())]).start()
-    else:
+    if no_change_count >= 24:
         # Exit Application
+        schedule.clear()
         print("Exiting Application as no change has been detected in 120 minutes")
         exit(0)
 
@@ -98,7 +97,7 @@ def predict(arg):
         imgsz=640,
         name="fbc-seg-{}-e{}".format(arg["size"][0], last_epoch),
         project="predictions",
-        verbose=True,
+        verbose=False,
         save=True,
         save_txt=False,  # Save masks as .txt file
         save_conf=False,  # save results with confidence scores
@@ -115,6 +114,10 @@ def predict(arg):
     time_elapsed = end_time - start_time
     print("\n› Completed: {}".format(end_time.strftime("%Y-%m-%d %H:%M:%S")))
     print("› Total Time: {}\n".format(time_elapsed))
+
+
+def main():
+    check_epoch(vars(parser.parse_args()))
 
 
 if __name__ == "__main__":
@@ -134,7 +137,12 @@ if __name__ == "__main__":
         )
         print("› Process will run every 5 Epochs\n")
 
-        main(vars(parser.parse_args()))
+        schedule.every(10).minutes.do(main)
+        while True:
+            schedule.run_pending()
+            time.sleep(60)
+
     except KeyboardInterrupt:
+        schedule.clear()
         print("Exited Application")
         exit(0)
