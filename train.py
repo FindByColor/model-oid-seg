@@ -13,6 +13,9 @@ from ultralytics import YOLO
 
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
 
+# Run script from current working directory
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 models = {
     "nano": "yolov8n-seg.pt",
     "small": "yolov8s-seg.pt",

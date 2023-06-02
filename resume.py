@@ -10,7 +10,11 @@ from clearml import Task
 from datetime import datetime
 from ultralytics import YOLO
 
+# Set CUDA Allocation to 512MB
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
+
+# Run script from current working directory
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
 class ModelSizes(str, enum.Enum):
