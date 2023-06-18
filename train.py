@@ -39,7 +39,11 @@ def main(arg):
     print("› Started: {}".format(start_time.strftime("%Y-%m-%d %H:%M:%S")))
 
     # Create Task for ClearML
-    task = Task.init(project_name="Find By Color", task_name="Segmentation Model")
+    task = Task.init(
+        project_name="Find By Color",
+        task_name="Segmentation Model",
+        auto_connect_streams={"stdout": False, "stderr": False, "logging": False},
+    )
 
     if torch.cuda.is_available():
         device = "0"
@@ -59,6 +63,7 @@ def main(arg):
         epochs=1000,
         exist_ok=True,
         imgsz=640,
+        mask_ratio=1,
         name="fbc-seg-{}".format(arg["size"][0]),
         patience=50,
         project="fbc-ml-models",

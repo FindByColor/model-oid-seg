@@ -5,7 +5,9 @@
 config.yaml
 data
 fbc-ml-models
+fbc-ml-models-*
 predictions
+predictions-*
 masks
 meta
 runs
