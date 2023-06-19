@@ -34,8 +34,10 @@ def main(arg):
     task = Task.init(
         project_name="Find By Color",
         task_name="Segmentation Model",
+        tags=["fbc-seg-{}".format(arg["size"][0])],
         continue_last_task=True,
         auto_connect_streams={"stdout": False, "stderr": False, "logging": False},
+        auto_connect_frameworks={"pytorch": False, "matplotlib": False},
     )
 
     if torch.cuda.is_available():
@@ -45,9 +47,11 @@ def main(arg):
 
     # Define Args for both YOLO and ClearML
     args = dict(
+        batch=-1,
+        cache="disk",
         data="config.yaml",
         device=device,
-        epochs=1000,
+        epochs=5000,
         exist_ok=True,
         imgsz=640,
         mask_ratio=1,
@@ -56,7 +60,7 @@ def main(arg):
         project="fbc-ml-models",
         resume=True,
         save_period=10,
-        verbose=True,
+        verbose=False,
     )
 
     # Connect Args to YOLO

@@ -39,6 +39,13 @@ NOTE: You only need to do this once.  If you are not sure if you have done this 
 clearml-init
 ```
 
+NOTE: After initializing, you should change these settings in `~/clearml.conf` to reduce the amount of API calls sent:
+
+```yml
+report_period_sec: 300
+log_stdout: false
+```
+
 ## Windows WSL
 
 > You will likely need to run this command before you can run the install process ( replace `3.9` in `python3.9-venv` with your machines version of python )
