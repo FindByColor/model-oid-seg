@@ -28,16 +28,23 @@ def main(arg):
     start_time = datetime.now()
     print("› Starting Prediction: {}".format(start_time.strftime("%Y-%m-%d %H:%M:%S")))
 
+    # Fetch code size from args
+    code = arg["size"][0]
+
+    # Fix code used for naming
+    if code == "e":
+        code = "x"
+
     if torch.cuda.is_available():
         device = "0"
     else:
         device = "cpu"
 
     # Load the last model from previous training session
-    model = YOLO("fbc-ml-models/fbc-seg-{}/weights/last.pt".format(arg["size"][0]))
+    model = YOLO("fbc-ml-models/fbc-seg-{}/weights/last.pt".format(code))
 
     with open(
-        "fbc-ml-models/fbc-seg-{}/results.csv".format(arg["size"][0]),
+        "fbc-ml-models/fbc-seg-{}/results.csv".format(code),
         "r",
         encoding="utf-8",
         errors="ignore",
@@ -50,7 +57,7 @@ def main(arg):
         device=device,
         exist_ok=True,
         imgsz=640,
-        name="fbc-seg-{}-e{}".format(arg["size"][0], last_epoch),
+        name="fbc-seg-{}-e{}".format(code, last_epoch),
         project="predictions",
         verbose=True,
         save=True,

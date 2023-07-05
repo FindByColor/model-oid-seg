@@ -34,10 +34,17 @@ def main(arg):
     global last_epoch
     global last_run
 
+    # Fetch code size from args
+    code = arg["size"][0]
+
+    # Fix code used for naming
+    if code == "e":
+        code = "x"
+
     # Make sure file exists
-    if os.path.isfile("fbc-ml-models/fbc-seg-{}/results.csv".format(arg["size"][0])):
+    if os.path.isfile("fbc-ml-models/fbc-seg-{}/results.csv".format(code)):
         with open(
-            "fbc-ml-models/fbc-seg-{}/results.csv".format(arg["size"][0]),
+            "fbc-ml-models/fbc-seg-{}/results.csv".format(code),
             "r",
             encoding="utf-8",
             errors="ignore",
@@ -57,7 +64,7 @@ def main(arg):
                         print("› Next Run ETA: {}".format(time_elapsed))
 
                     if not os.path.exists(
-                        "predictions/fbc-seg-{}-e{}".format(arg["size"][0], last_epoch)
+                        "predictions/fbc-seg-{}-e{}".format(code, last_epoch)
                     ):
                         if debug is True:
                             print(
@@ -88,14 +95,14 @@ def predict(arg):
         device = "cpu"
 
     # Load the last model from previous training session
-    model = YOLO("fbc-ml-models/fbc-seg-{}/weights/last.pt".format(arg["size"][0]))
+    model = YOLO("fbc-ml-models/fbc-seg-{}/weights/last.pt".format(code))
 
     # Define Args for both YOLO and ClearML
     args = dict(
         device=device,
         exist_ok=True,
         imgsz=640,
-        name="fbc-seg-{}-e{}".format(arg["size"][0], last_epoch),
+        name="fbc-seg-{}-e{}".format(code, last_epoch),
         project="predictions",
         verbose=True,
         save=True,

@@ -13,6 +13,9 @@ from ultralytics import YOLO
 # Set CUDA Allocation to 512MB
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
 
+# Increase Training Speed
+os.environ["OMP_NUM_THREADS"] = "1"
+
 # Run script from current working directory
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -30,11 +33,18 @@ def main(arg):
     start_time = datetime.now()
     print("› Resuming: {}".format(start_time.strftime("%Y-%m-%d %H:%M:%S")))
 
+    # Fetch code size from args
+    code = arg["size"][0]
+
+    # Fix code used for naming
+    if code == "e":
+        code = "x"
+
     # Create Task for ClearML
     task = Task.init(
         project_name="Find By Color",
         task_name="Segmentation Model",
-        tags=["fbc-seg-{}".format(arg["size"][0])],
+        tags=["fbc-seg-{}".format(code)],
         continue_last_task=True,
         auto_connect_streams={"stdout": False, "stderr": False, "logging": False},
         auto_connect_frameworks={"pytorch": False, "matplotlib": False},
@@ -51,23 +61,25 @@ def main(arg):
         cache="disk",
         data="config.yaml",
         device=device,
-        epochs=5000,
+        epochs=10000,
         exist_ok=True,
-        imgsz=640,
+        imgsz=1024,
         mask_ratio=1,
-        name="fbc-seg-{}".format(arg["size"][0]),
+        name="fbc-seg-{}".format(code),
         patience=50,
         project="fbc-ml-models",
         resume=True,
         save_period=10,
         verbose=False,
+        retina_masks=True,
+        workers=16,
     )
 
     # Connect Args to YOLO
     task.connect(args)
 
     # Load the last model from previous training session
-    model = YOLO("fbc-ml-models/fbc-seg-{}/weights/last.pt".format(arg["size"][0]))
+    model = YOLO("fbc-ml-models/fbc-seg-{}/weights/last.pt".format(code))
 
     # Restart training from last training point
     model.train(**args)

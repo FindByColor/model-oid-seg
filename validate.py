@@ -35,8 +35,15 @@ def main(arg):
     start_time = datetime.now()
     print("› Starting Validation: {}".format(start_time.strftime("%Y-%m-%d %H:%M:%S")))
 
+    # Fetch code size from args
+    code = arg["size"][0]
+
+    # Fix code used for naming
+    if code == "e":
+        code = "x"
+
     # Load the last model from previous training session
-    model = YOLO("fbc-ml-models/fbc-seg-{}/weights/last.pt".format(arg["size"][0]))
+    model = YOLO("fbc-ml-models/fbc-seg-{}/weights/last.pt".format(code))
 
     # Evaluate the model's performance on the validation set
     model.val()
